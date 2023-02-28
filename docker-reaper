@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+# Cleans up old docker stuff that may be lying around
+
+for c in $(docker ps -aq);
+    do
+        docker rm $c
+    done
+
+for i in $(docker images -q -f dangling=true);
+    do
+        docker rmi $i;
+    done

@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+INPUT=${1:-default}
+if [ "$INPUT" == "default" ]; then
+    echo "Error: you forgot the title!"
+    exit 1
+fi
+# PROMPT_COMMAND="echo -ne \"\033]0;"$INPUT"\007\""
+echo -ne "\033]0;"$INPUT"\007"
