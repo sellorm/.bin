@@ -2,9 +2,5 @@
 	{
 		"repo": "https://github.com/sellorm/monotony.git",
 		"command": "monotony"
-	},
-	{
-		"repo": "https://github.com/sellorm/bashdown.git",
-		"command": "bashdown"
 	}
 ]
