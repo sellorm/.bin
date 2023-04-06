@@ -1,0 +1,82 @@
+#!/usr/bin/env lua
+
+usage_message = [[Usage: shlog <log_level> <log_message>
+
+Shell script tool to emit nicely formatted log messages
+
+Arguments:
+    log_level      Should be one of: trace, debug, info, warn, error, fatal
+    log_message    The message you'd like to emit
+
+Options:
+    -h             Show this help and exit
+
+Environment variable:
+    Set the LOG_LEVEL in your environment to an appropriate level from the
+    list above. eg `export LOG_LEVEL=DEBUG`]]
+
+-- the levels need numeric equivalents to that we can evaluate the supplied
+-- log_level against the environment variable to control what gets emitted
+levels = {
+  ["TRACE"] = 0,
+  ["DEBUG"] = 1,
+  ["INFO"]  = 2,
+  ["WARN"]  = 3,
+  ["ERROR"] = 4,
+  ["FATAL"] = 5,
+}
+
+-- helpful usage printer
+function usage (exit_code)
+  print(usage_message)
+  os.exit(exit_code)
+end
+
+-- handle -h for help
+if log_level == "-h" then
+  usage(0)
+end
+
+-- handle no log_level set
+if arg[1] == nil then
+  usage(1)
+end
+
+-- handle no log_message set
+if arg[2] == nil then
+  usage(2)
+end
+curtime = os.date("!%Y-%m-%d %T UTC") -- the ! is to force UTC
+
+log_level = string.upper(arg[1])
+log_message = arg[2]
+
+
+-- read log level from the environment
+env_log_level = os.getenv("LOG_LEVEL")
+if env_log_level == nil then
+  env_log_level = "INFO"
+end
+env_log_level_numeric = levels[string.upper(env_log_level)]
+if env_log_level_numeric == nil then
+  print("Error: configured LOG_LEVEL ("..env_log_level..") is not in list:")
+  print("    TRACE, DEBUG, INFO, WARN, ERROR, FATAL")
+  os.exit(3)
+end
+
+
+-- convert the provided log level to numeric
+log_level_numeric = levels[log_level]
+if log_level_numeric == nil then
+  print("Warning: Supplied log_level is invalid - defaulting to INFO")
+  log_level = "INFO"
+  log_level_numeric = levels["INFO"]
+end
+
+
+-- prepare output and print
+if log_level_numeric >= env_log_level_numeric then
+  output = string.format("%s [%s] %s", curtime, log_level, log_message)
+  print(output)
+end
+
